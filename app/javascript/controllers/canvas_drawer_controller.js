@@ -21,6 +21,9 @@ export default class extends Controller {
     updateUrl: String,
     duration: { type: Number, default: 300 }, // seconds
     lineWidth: { type: Number, default: 3 },
+    // Minimum distance (in canvas px) between kept points before smoothing.
+    // Higher = smoother/looser curve, lower = closer to the exact trace.
+    smoothing: { type: Number, default: 8 },
   }
 
   connect() {
@@ -69,6 +72,9 @@ export default class extends Controller {
 
     canvas.width = cssWidth * ratio
     canvas.height = cssHeight * ratio
+
+    canvas.style.width = `${cssWidth}px`
+    canvas.style.height = `${cssHeight}px`
 
     const ctx = canvas.getContext("2d")
     ctx.scale(ratio, ratio)
@@ -120,10 +126,37 @@ export default class extends Controller {
 
     // Drop accidental taps that produced no real movement
     if (this.currentStroke.length > 1) {
-      this.strokes.push(this.currentStroke)
+      const simplified = this.simplifyStroke(this.currentStroke)
+      // A stroke needs at least 2 points to draw; fall back to the
+      // original if simplifying somehow collapsed it further.
+      this.strokes.push(simplified.length > 1 ? simplified : this.currentStroke)
+      // Replace the raw live-drawn path with its smoothed version now
+      // that the stroke is finished.
+      this.redrawAll()
     }
     this.currentStroke = null
     this.updateUndoButton()
+  }
+
+  // Drops points that fall within `smoothingValue` px of the last kept
+  // point. Fewer, more spread-out points make the quadratic curve in
+  // redrawAll() bend more smoothly; more points hug the original trace
+  // more closely. Always keeps the first and last point of the stroke.
+  simplifyStroke(stroke) {
+    if (this.smoothingValue <= 0 || stroke.length <= 2) return stroke
+ 
+    const kept = [stroke[0]]
+    for (let i = 1; i < stroke.length - 1; i++) {
+      const last = kept[kept.length - 1]
+      const point = stroke[i]
+      const dx = point.x - last.x
+      const dy = point.y - last.y
+      if (Math.sqrt(dx * dx + dy * dy) >= this.smoothingValue) {
+        kept.push(point)
+      }
+    }
+    kept.push(stroke[stroke.length - 1])
+    return kept
   }
 
   undo() {
@@ -133,21 +166,31 @@ export default class extends Controller {
     this.updateUndoButton()
   }
 
+  drawSmoothStroke(ctx, stroke) {
+    if (stroke.length < 3) {
+      ctx.beginPath()
+      ctx.moveTo(stroke[0].x, stroke[0].y)
+      stroke.forEach(p => ctx.lineTo(p.x, p.y))
+      ctx.stroke()
+      return
+    }
+    ctx.beginPath()
+    ctx.moveTo(stroke[0].x, stroke[0].y)
+    for (let i = 1; i < stroke.length - 1; i++) {
+      const xc = (stroke[i].x + stroke[i + 1].x) / 2
+      const yc = (stroke[i].y + stroke[i + 1].y) / 2
+      ctx.quadraticCurveTo(stroke[i].x, stroke[i].y, xc, yc)
+    }
+    ctx.stroke()
+  }
+
   redrawAll() {
     const canvas = this.canvasTarget
     const ratio = window.devicePixelRatio || 1
     this.ctx.clearRect(0, 0, canvas.width / ratio, canvas.height / ratio)
 
     for (const stroke of this.strokes) {
-      this.ctx.beginPath()
-      stroke.forEach((point, i) => {
-        if (i === 0) {
-          this.ctx.moveTo(point.x, point.y)
-        } else {
-          this.ctx.lineTo(point.x, point.y)
-        }
-      })
-      this.ctx.stroke()
+      this.drawSmoothStroke(this.ctx, stroke)
     }
   }
 
