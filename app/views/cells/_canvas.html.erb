@@ -1,0 +1,33 @@
+<%# app/views/cells/_canvas.html.erb
+    Renders the drawing surface for one cell. Expects a local `cell`. %>
+
+<div class="cell-drawer"
+     data-controller="canvas-drawer"
+     data-canvas-drawer-cell-id-value="<%= cell.id %>"
+     data-canvas-drawer-update-url-value="<%= cell_path(cell) %>"
+     data-canvas-drawer-duration-value="300"
+     data-canvas-drawer-line-width-value="3">
+
+  <div class="cell-drawer__header">
+    <span class="cell-drawer__prompt"><%= cell.prompt %></span>
+    <span class="cell-drawer__timer" data-canvas-drawer-target="timer">5:00</span>
+  </div>
+
+  <canvas class="cell-drawer__canvas"
+          data-canvas-drawer-target="canvas"
+          width="300" height="300"></canvas>
+
+  <div class="cell-drawer__controls">
+    <button type="button"
+            data-canvas-drawer-target="undoButton"
+            data-action="canvas-drawer#undo"
+            disabled>
+      Undo
+    </button>
+    <button type="button"
+            data-canvas-drawer-target="finishButton"
+            data-action="canvas-drawer#finish">
+      Done
+    </button>
+  </div>
+</div>
