@@ -19,6 +19,7 @@ export default class extends Controller {
   static values = {
     cellId: Number,
     updateUrl: String,
+    returnUrl: { type: String, default: "/" },
     duration: { type: Number, default: 300 }, // seconds
     lineWidth: { type: Number, default: 3 },
     // Minimum distance (in canvas px) between kept points before smoothing.
@@ -256,6 +257,7 @@ export default class extends Controller {
       if (!response.ok) throw new Error(`Save failed: ${response.status}`)
 
       this.dispatch("saved", { detail: { cellId: this.cellIdValue } })
+      window.location.href = this.returnUrlValue
     } catch (error) {
       this.submitted = false
       if (this.hasFinishButtonTarget) {

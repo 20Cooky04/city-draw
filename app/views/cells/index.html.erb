@@ -1,0 +1,102 @@
+<%# app/views/cells/index.html.erb %>
+
+<div class="city-grid-page">
+  <div class="city-grid-nav city-grid-nav--top">
+    <%= link_to "↑ Up",
+          cells_path(offset_row: @offset_row - 1, offset_column: @offset_column),
+          class: "grid-arrow #{'grid-arrow--disabled' if @offset_row <= 0}" %>
+  </div>
+
+  <div class="city-grid-nav city-grid-nav--middle">
+    <%= link_to "← Left",
+          cells_path(offset_row: @offset_row, offset_column: @offset_column - 1),
+          class: "grid-arrow #{'grid-arrow--disabled' if @offset_column <= 0}" %>
+
+    <div class="city-grid"
+         style="grid-template-columns: repeat(<%= GridConfig::VIEWPORT_COLUMNS %>, <%= GridConfig::CELL_SIZE %>px);
+                grid-template-rows: repeat(<%= GridConfig::VIEWPORT_ROWS %>, <%= GridConfig::CELL_SIZE %>px);">
+      <% (@offset_row...(@offset_row + GridConfig::VIEWPORT_ROWS)).each do |row| %>
+        <% (@offset_column...(@offset_column + GridConfig::VIEWPORT_COLUMNS)).each do |column| %>
+          <% cell = @cells_by_position[[row, column]] %>
+          <div class="city-grid__cell" style="width: <%= GridConfig::CELL_SIZE %>px; height: <%= GridConfig::CELL_SIZE %>px;">
+            <% if cell&.completed? %>
+              <%= link_to cell_path(cell), class: "city-grid__thumb-link" do %>
+                <svg viewBox="0 0 <%= GridConfig::DRAW_CANVAS_SIZE %> <%= GridConfig::DRAW_CANVAS_SIZE %>" class="city-grid__thumb">
+                  <% JSON.parse(cell.strokes).each do |stroke| %>
+                    <path d="<%= stroke_to_svg_path(stroke) %>"
+                          stroke="black" fill="none"
+                          stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+                  <% end %>
+                </svg>
+              <% end %>
+            <% elsif cell %>
+              <%= link_to "Draw", cell_path(cell), class: "city-grid__empty" %>
+            <% else %>
+              <div class="city-grid__missing"></div>
+            <% end %>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+
+    <%= link_to "Right →",
+          cells_path(offset_row: @offset_row, offset_column: @offset_column + 1),
+          class: "grid-arrow #{'grid-arrow--disabled' if @offset_column >= GridConfig::TOTAL_COLUMNS - GridConfig::VIEWPORT_COLUMNS}" %>
+  </div>
+
+  <div class="city-grid-nav city-grid-nav--bottom">
+    <%= link_to "↓ Down",
+          cells_path(offset_row: @offset_row + 1, offset_column: @offset_column),
+          class: "grid-arrow #{'grid-arrow--disabled' if @offset_row >= GridConfig::TOTAL_ROWS - GridConfig::VIEWPORT_ROWS}" %>
+  </div>
+</div>
+
+<style>
+  .city-grid-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .city-grid-nav--middle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .city-grid {
+    display: grid;
+    gap: 2px;
+    background: #ddd;
+    border: 1px solid #ccc;
+  }
+  .city-grid__cell {
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .city-grid__thumb-link {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .city-grid__thumb {
+    width: 100%;
+    height: 100%;
+  }
+  .city-grid__empty {
+    font-size: 0.75rem;
+    color: #888;
+    text-decoration: none;
+  }
+  .city-grid__missing {
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(45deg, #f5f5f5, #f5f5f5 4px, #eee 4px, #eee 8px);
+  }
+  .grid-arrow--disabled {
+    pointer-events: none;
+    opacity: 0.3;
+  }
+</style>
