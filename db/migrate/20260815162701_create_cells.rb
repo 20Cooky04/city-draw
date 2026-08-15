@@ -11,6 +11,6 @@ class CreateCells < ActiveRecord::Migration[7.1]
       t.timestamps
     end
 
-    add_index :cells, [:row, :column], unique: true
+    add_index :cells, [ :row, :column ], unique: true
   end
 end

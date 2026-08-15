@@ -1,8 +1,8 @@
 class Cell < ApplicationRecord
-  CATEGORIES = %w[building nature].freeze
+  CATEGORIES = %w[ building nature ].freeze
 
-  BUILDING_PROMPTS = ["Skyscraper", "Cottage", "Windmill", "Lighthouse", "Bridge", "Bell Tower"]
-  NATURE_PROMPTS   = ["Oak Tree", "Pond", "Mountain", "Flower Field", "Rocky Cliff", "Bush"]
+  BUILDING_PROMPTS = [ "Skyscraper", "Cottage", "Windmill", "Lighthouse", "Bridge", "Bell Tower" ]
+  NATURE_PROMPTS   = [ "Oak Tree", "Pond", "Mountain", "Flower Field", "Rocky Cliff", "Bush" ]
 
   validates :row, :column, presence: true
   validates :category, inclusion: { in: CATEGORIES }
