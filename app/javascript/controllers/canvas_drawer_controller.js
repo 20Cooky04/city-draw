@@ -15,7 +15,7 @@ import { Controller } from "@hotwired/stimulus"
 //   </div>
 //
 export default class extends Controller {
-  static targets = ["canvas", "timer", "undoButton", "finishButton"]
+  static targets = ["canvas", "timer", "undoButton", "finishButton", "discardButton"]
   static values = {
     cellId: Number,
     updateUrl: String,
@@ -224,6 +224,23 @@ export default class extends Controller {
     const seconds = Math.max(0, this.remainingSeconds % 60)
     this.timerTarget.textContent =
       `${minutes}:${seconds.toString().padStart(2, "0")}`
+  }
+
+  // --- Discard ---------------------------------------------------------------
+
+  // Leaves without persisting anything — no fetch, strokes are just discarded.
+  discard() {
+    if (this.submitted) return
+
+    // Only bother asking if there's actually something to lose.
+    if (this.strokes.length > 0) {
+      const confirmed = window.confirm("Discard this drawing?")
+      if (!confirmed) return
+    }
+
+    this.submitted = true
+    clearInterval(this.timerInterval)
+    window.location.href = this.returnUrlValue
   }
 
   // --- Submission ---------------------------------------------------------
