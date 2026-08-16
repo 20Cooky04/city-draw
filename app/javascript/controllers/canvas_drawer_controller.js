@@ -19,7 +19,7 @@ export default class extends Controller {
   static values = {
     cellId: Number,
     updateUrl: String,
-    returnUrl: { type: String, default: "/" },
+    returnUrl: { type: String, default: "/grid" },
     duration: { type: Number, default: 300 }, // seconds
     lineWidth: { type: Number, default: 3 },
     // Minimum distance (in canvas px) between kept points before smoothing.

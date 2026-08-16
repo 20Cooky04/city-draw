@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= content_for(:title) || "Coolspots" %></title>
+    <title><%= content_for(:title) || "City Draw" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="Coolspots">
+    <meta name="application-name" content="City Draw">
     <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
@@ -24,6 +24,15 @@
   </head>
 
   <body>
+    <header class="app-bar">
+      <%= link_to "City Draw", root_path, class: "app-bar__brand" %>
+
+      <nav class="app-bar__nav">
+        <%= link_to "Dashboard", root_path, class: "app-bar__link" %>
+        <%= link_to "Grid", grid_path, class: "app-bar__link" %>
+      </nav>
+    </header>
+
     <%= yield %>
   </body>
 </html>
