@@ -10,8 +10,10 @@ import { Controller } from "@hotwired/stimulus"
 // is a completed cell of the same category, picks one at random (any
 // direction, including walking straight back the way it came -- pairs can
 // be revisited freely) and walks there, routing around drawn strokes via a
-// coarse occupancy grid + A* search. A sprite only stops if it hits a dead
-// end (no valid neighbor) or the controller disconnects (e.g. on grid
+// coarse occupancy grid + A* search. A sprite stops (removing itself) if
+// it hits a dead end (no valid neighbor), if the chosen target is
+// unreachable through the occupancy grid (e.g. a stroke fully partitions
+// the two cells), or if the controller disconnects (e.g. on grid
 // navigation).
 //
 // ART: sprites render bird.svg (nature) / car.svg (building), passed in as
@@ -176,11 +178,14 @@ export default class extends Controller {
       return
     }
 
-    let path = this.findPath(grid, startCombined, targetCombined)
-    // Fallback: if no route exists through the occupancy grid (e.g. a
-    // stroke fully partitions the two cells), just walk straight through.
-    // Not real avoidance, but keeps the sprite from getting stuck forever.
-    if (!path) path = [startCombined, targetCombined]
+    const path = this.findPath(grid, startCombined, targetCombined)
+    if (!path) {
+      // No route exists through the occupancy grid (e.g. a stroke fully
+      // partitions the two cells). Rather than cut through the ink,
+      // despawn -- a fresh sprite may find a clearer route next time.
+      spriteEl.remove()
+      return
+    }
 
     const localWaypoints = path.map((gc) => this.gridCellToLocalPoint(gc, localSize, resolution))
     const screenWaypoints = localWaypoints.map((pt) =>
