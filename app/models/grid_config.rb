@@ -19,7 +19,7 @@ module GridConfig
   # Pixel size of the actual drawing canvas used in the edit window. The
   # grid thumbnail's SVG viewBox uses this so strokes line up correctly
   # regardless of CELL_SIZE.
-  DRAW_CANVAS_SIZE = 300
+  DRAW_CANVAS_SIZE = 600
 
   # Clamp an offset so the viewport never scrolls past the grid's edges.
   def self.clamp_row_offset(value)

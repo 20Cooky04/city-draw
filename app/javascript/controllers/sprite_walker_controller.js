@@ -28,7 +28,7 @@ export default class extends Controller {
     // Local coordinate space strokes are stored in. Matches
     // GridConfig::DRAW_CANVAS_SIZE — passed in from the view so this file
     // never hardcodes it.
-    drawCanvasSize: { type: Number, default: 300 },
+    drawCanvasSize: { type: Number, default: 600 },
     // How finely to rasterize strokes into an obstacle grid, in grid
     // cells per cell-side. Higher = more precise avoidance, more compute.
     gridResolution: { type: Number, default: 24 },
