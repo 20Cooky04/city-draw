@@ -15,6 +15,8 @@
     <div class="city-grid"
          data-controller="sprite-walker"
          data-sprite-walker-draw-canvas-size-value="<%= GridConfig::DRAW_CANVAS_SIZE %>"
+         data-sprite-walker-nature-image-url-value="<%= asset_path('sprites/bird.svg') %>"
+         data-sprite-walker-building-image-url-value="<%= asset_path('sprites/car.svg') %>"
          style="position: relative;
                 grid-template-columns: repeat(<%= GridConfig::VIEWPORT_COLUMNS %>, <%= GridConfig::CELL_SIZE %>px);
                 grid-template-rows: repeat(<%= GridConfig::VIEWPORT_ROWS %>, <%= GridConfig::CELL_SIZE %>px);">
@@ -112,18 +114,21 @@
     opacity: 0.3;
   }
 
-  /* Placeholder sprite art — see sprite_walker_controller.js#buildSpriteElement
-     for where to swap these in for real images/animation frames later. */
+  /* Walking sprites — see sprite_walker_controller.js#buildSpriteElement.
+     Position/rotation are set via inline style.transform on .sprite-placeholder
+     itself (translate to center + rotate to face direction of travel); the
+     img just fills the box. */
   .sprite-placeholder {
     position: absolute;
-    border-radius: 50%;
+    top: 0;
+    left: 0;
     pointer-events: none;
     z-index: 5;
   }
-  .sprite-placeholder--nature {
-    background: #6fae4a;
-  }
-  .sprite-placeholder--building {
-    background: #4a90d9;
+  .sprite-placeholder img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
   }
 </style>

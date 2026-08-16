@@ -14,10 +14,12 @@ import { Controller } from "@hotwired/stimulus"
 // end (no valid neighbor) or the controller disconnects (e.g. on grid
 // navigation).
 //
-// PLACEHOLDER ART: sprites currently render as plain colored circles
-// (see .sprite-placeholder in index.html.erb's <style> block). Swap in
-// real sprite images/animation frames by changing buildSpriteElement()
-// below -- position/animation logic is unaffected.
+// ART: sprites render bird.svg (nature) / car.svg (building), passed in as
+// URLs via the natureImageUrl/buildingImageUrl values -- see
+// buildSpriteElement(). Both source images face up/north as drawn, so
+// rotation is computed from each leg's direction of travel and applied
+// every frame (see headingAngle()/placeSprite()), keeping the sprite
+// oriented correctly through turns at waypoints and between legs.
 export default class extends Controller {
   static targets = ["cell"]
   static values = {
@@ -30,9 +32,19 @@ export default class extends Controller {
     gridResolution: { type: Number, default: 24 },
     // Padding (in local 0..drawCanvasSize units) around each stroke
     // segment that counts as blocked, so sprites don't graze the ink.
-    strokePadding: { type: Number, default: 12 },
-    // Walking speed in on-screen pixels per second.
+    strokePadding: { type: Number, default: 1 },
+    // Moving speed in on-screen pixels per second.
     speed: { type: Number, default: 40 },
+    // Asset URLs for the two sprite images, passed in from the view via
+    // asset_path so this file never hardcodes a path. Keyed by cell
+    // category, same as everything else here.
+    natureImageUrl: { type: String, default: "" },
+    buildingImageUrl: { type: String, default: "" },
+    // Both source SVGs are drawn facing "up" (north) already, so 0 needs
+    // no correction. If you swap in art that faces a different way,
+    // adjust the matching offset here instead of touching rotation math.
+    natureBaseAngle: { type: Number, default: 0 },
+    buildingBaseAngle: { type: Number, default: 0 },
   }
 
   connect() {
@@ -109,10 +121,10 @@ export default class extends Controller {
       homeCell,
       localSize
     )
-    spriteEl.style.left = `${startPoint.x}px`
-    spriteEl.style.top = `${startPoint.y}px`
+    // No movement yet, so just face the art's natural resting direction.
+    const state = { cancelled: false, angle: this.baseAngleFor(category) }
+    this.placeSprite(spriteEl, startPoint.x, startPoint.y, state.angle)
 
-    const state = { cancelled: false }
     this.activeSprites.push({ state, el: spriteEl })
 
     this.walkNextLeg(state, spriteEl, homeCell, startLocal, category)
@@ -177,7 +189,7 @@ export default class extends Controller {
 
     const nextLocal = this.combinedToLocal(targetCombined, neighborRole, axis, resolution)
 
-    this.animateLeg(state, spriteEl, screenWaypoints, () => {
+    this.animateLeg(state, spriteEl, screenWaypoints, category, () => {
       this.walkNextLeg(state, spriteEl, neighborEl, nextLocal, category)
     })
   }
@@ -493,30 +505,57 @@ export default class extends Controller {
   // --- Sprite element + animation --------------------------------------------
 
   buildSpriteElement(category, referenceCell) {
-    const size = Math.max(4, referenceCell.offsetWidth / 10)
+    const size = Math.max(8, referenceCell.offsetWidth / 6)
+    const imageUrl = category === "nature" ? this.natureImageUrlValue : this.buildingImageUrlValue
 
     const el = document.createElement("div")
     el.className = `sprite-placeholder sprite-placeholder--${category}`
     el.style.width = `${size}px`
     el.style.height = `${size}px`
-    el.style.marginLeft = `${-size / 2}px`
-    el.style.marginTop = `${-size / 2}px`
+
+    const img = document.createElement("img")
+    img.src = imageUrl
+    img.alt = ""
+    img.draggable = false
+    el.appendChild(img)
+
     return el
+  }
+
+  baseAngleFor(category) {
+    return category === "nature" ? this.natureBaseAngleValue : this.buildingBaseAngleValue
+  }
+
+  // Positions el (top-left anchor at x,y, then centered via transform) and
+  // rotates it to angleDeg. Rotation is measured clockwise from the art's
+  // drawn-facing direction (both bird.svg and car.svg face up/north as
+  // drawn, so 0deg = facing up), matching the convention used in
+  // headingAngle() below.
+  placeSprite(el, x, y, angleDeg) {
+    el.style.left = `${x}px`
+    el.style.top = `${y}px`
+    el.style.transform = `translate(-50%, -50%) rotate(${angleDeg}deg)`
+  }
+
+  // Converts a screen-space movement vector into a rotation for art that
+  // faces up/north at 0deg. atan2 measures clockwise from "facing right"
+  // in screen coordinates (y grows downward), so adding 90deg re-bases it
+  // to measure clockwise from "facing up" instead.
+  headingAngle(dx, dy, baseAngle) {
+    return (Math.atan2(dy, dx) * 180) / Math.PI + 90 + baseAngle
   }
 
   // Walks el along waypoints, calling onArrive() when it reaches the end
   // instead of removing it -- the caller decides what happens next (i.e.
-  // walkNextLeg picks another neighbor and keeps going). Checks
-  // state.cancelled on every frame so disconnect() can halt mid-leg.
-  animateLeg(state, el, waypoints, onArrive) {
+  // walkNextLeg picks another neighbor and keeps going). Rotates el to
+  // face the direction of travel each frame, so turns at waypoints (and
+  // between legs) read as the sprite turning rather than sliding sideways.
+  // Checks state.cancelled on every frame so disconnect() can halt mid-leg.
+  animateLeg(state, el, waypoints, category, onArrive) {
     let segmentIndex = 0
     let segmentStart = performance.now()
     const speed = this.speedValue // px/sec
-
-    const place = (x, y) => {
-      el.style.left = `${x}px`
-      el.style.top = `${y}px`
-    }
+    const baseAngle = this.baseAngleFor(category)
 
     const step = (now) => {
       if (state.cancelled) return
@@ -533,10 +572,16 @@ export default class extends Controller {
       const segmentLength = Math.sqrt(dx * dx + dy * dy)
       const segmentDuration = Math.max(1, (segmentLength / speed) * 1000) // ms
 
+      // Zero-length segments (can happen at path fallbacks) keep facing
+      // whichever direction the sprite was already heading.
+      if (dx !== 0 || dy !== 0) {
+        state.angle = this.headingAngle(dx, dy, baseAngle)
+      }
+
       const elapsed = now - segmentStart
       const t = Math.min(1, elapsed / segmentDuration)
 
-      place(from.x + dx * t, from.y + dy * t)
+      this.placeSprite(el, from.x + dx * t, from.y + dy * t, state.angle)
 
       if (t >= 1) {
         segmentIndex++
