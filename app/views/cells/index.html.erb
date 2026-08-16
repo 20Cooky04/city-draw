@@ -13,12 +13,24 @@
           class: "grid-arrow #{'grid-arrow--disabled' if @offset_column <= 0}" %>
 
     <div class="city-grid"
-         style="grid-template-columns: repeat(<%= GridConfig::VIEWPORT_COLUMNS %>, <%= GridConfig::CELL_SIZE %>px);
+         data-controller="sprite-walker"
+         data-sprite-walker-draw-canvas-size-value="<%= GridConfig::DRAW_CANVAS_SIZE %>"
+         style="position: relative;
+                grid-template-columns: repeat(<%= GridConfig::VIEWPORT_COLUMNS %>, <%= GridConfig::CELL_SIZE %>px);
                 grid-template-rows: repeat(<%= GridConfig::VIEWPORT_ROWS %>, <%= GridConfig::CELL_SIZE %>px);">
       <% (@offset_row...(@offset_row + GridConfig::VIEWPORT_ROWS)).each do |row| %>
         <% (@offset_column...(@offset_column + GridConfig::VIEWPORT_COLUMNS)).each do |column| %>
           <% cell = @cells_by_position[[row, column]] %>
-          <div class="city-grid__cell" style="width: <%= GridConfig::CELL_SIZE %>px; height: <%= GridConfig::CELL_SIZE %>px;">
+          <div class="city-grid__cell"
+               style="width: <%= GridConfig::CELL_SIZE %>px; height: <%= GridConfig::CELL_SIZE %>px;"
+               <% if cell %>
+                 data-sprite-walker-target="cell"
+                 data-row="<%= row %>"
+                 data-column="<%= column %>"
+                 data-category="<%= cell.category %>"
+                 data-completed="<%= cell.completed? %>"
+                 <% if cell.completed? %>data-strokes="<%= cell.strokes %>"<% end %>
+               <% end %>>
             <% if cell&.completed? %>
               <%= link_to cell_path(cell), class: "city-grid__thumb-link" do %>
                 <svg viewBox="0 0 <%= GridConfig::DRAW_CANVAS_SIZE %> <%= GridConfig::DRAW_CANVAS_SIZE %>" class="city-grid__thumb">
@@ -98,5 +110,20 @@
   .grid-arrow--disabled {
     pointer-events: none;
     opacity: 0.3;
+  }
+
+  /* Placeholder sprite art — see sprite_walker_controller.js#buildSpriteElement
+     for where to swap these in for real images/animation frames later. */
+  .sprite-placeholder {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 5;
+  }
+  .sprite-placeholder--nature {
+    background: #6fae4a;
+  }
+  .sprite-placeholder--building {
+    background: #4a90d9;
   }
 </style>

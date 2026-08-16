@@ -10,11 +10,11 @@ module GridConfig
 
   # How many rows/columns are visible in the grid view at once. Must be
   # <= TOTAL_ROWS / TOTAL_COLUMNS.
-  VIEWPORT_ROWS = 5
-  VIEWPORT_COLUMNS = 5
+  VIEWPORT_ROWS = 4
+  VIEWPORT_COLUMNS = 4
 
   # On-screen pixel size of each tile in the grid view (thumbnail size).
-  CELL_SIZE = 80
+  CELL_SIZE = 300
 
   # Pixel size of the actual drawing canvas used in the edit window. The
   # grid thumbnail's SVG viewBox uses this so strokes line up correctly
