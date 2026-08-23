@@ -18,6 +18,10 @@
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
@@ -25,14 +29,20 @@
 
   <body>
     <header class="app-bar">
-      <%= link_to "City Draw", root_path, class: "app-bar__brand" %>
-
+      <div class="app-bar__inner">
+        <a href="<%= root_path %>" class="app-bar__title">
+        <svg class="app-bar__mark" viewBox="0 0 40 24" aria-hidden="true">
+          <path d="M2 18 C 8 6, 14 22, 20 10 S 32 4, 38 14"
+            fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        City Draw
+        </a>
       <nav class="app-bar__nav">
-        <%= link_to "Dashboard", root_path, class: "app-bar__link" %>
-        <%= link_to "Grid", grid_path, class: "app-bar__link" %>
+        <%= link_to "Grid", grid_path %>
       </nav>
+    </div>
     </header>
-
     <%= yield %>
   </body>
 </html>
