@@ -15,7 +15,7 @@ import { Controller } from "@hotwired/stimulus"
 //   </div>
 //
 export default class extends Controller {
-  static targets = ["canvas", "timer", "undoButton", "finishButton", "discardButton"]
+  static targets = ["canvas", "timer", "undoButton", "finishButton", "discardButton", "discardDialog"]
   static values = {
     cellId: Number,
     updateUrl: String,
@@ -234,10 +234,32 @@ export default class extends Controller {
 
     // Only bother asking if there's actually something to lose.
     if (this.strokes.length > 0) {
-      const confirmed = window.confirm("Discard this drawing?")
-      if (!confirmed) return
+      this.openDiscardDialog()
+      return
     }
 
+    this.leaveWithoutSaving()
+  }
+
+  openDiscardDialog() {
+    if (this.hasDiscardDialogTarget && typeof this.discardDialogTarget.showModal === "function") {
+      this.discardDialogTarget.showModal()
+    } else {
+      // Fallback for browsers without <dialog> support or if the markup is missing
+      if (window.confirm("Discard this drawing?")) this.leaveWithoutSaving()
+    }
+  }
+
+  cancelDiscard() {
+    if (this.hasDiscardDialogTarget) this.discardDialogTarget.close()
+  }
+
+  confirmDiscard() {
+    if (this.hasDiscardDialogTarget) this.discardDialogTarget.close()
+    this.leaveWithoutSaving()
+  }
+
+  leaveWithoutSaving() {
     this.submitted = true
     clearInterval(this.timerInterval)
     window.location.href = this.returnUrlValue

@@ -109,3 +109,41 @@
   background: var(--paper);
   color: var(--ink);
 }
+
+/* ── Discard confirmation dialog ─────────────────────────────── */
+
+.discard-dialog {
+  border: none;
+  border-radius: 6px;
+  padding: 1.5rem;
+  width: 300px;
+  max-width: calc(100vw - 2rem);
+  font-family: var(--font-display);
+  color: var(--ink);
+  background: var(--paper);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+}
+
+.discard-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.discard-dialog__title {
+  margin: 0 0 0.4rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.discard-dialog__body {
+  margin: 0 0 1.5rem;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: var(--muted);
+}
+
+.discard-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+}

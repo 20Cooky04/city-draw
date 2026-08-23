@@ -45,4 +45,22 @@
       Discard
     </button>
   </div>
+
+  <dialog class="discard-dialog" data-canvas-drawer-target="discardDialog">
+    <p class="discard-dialog__title">Discard this drawing?</p>
+    <p class="discard-dialog__body">Your strokes for this cell haven't been saved. This can't be undone.</p>
+    <div class="discard-dialog__actions">
+      <button type="button"
+              class="btn btn--outline"
+              data-action="canvas-drawer#confirmDiscard">
+        Discard
+      </button>
+      <button type="button"
+              class="btn btn--solid"
+              autofocus
+              data-action="canvas-drawer#cancelDiscard">
+        Keep drawing
+      </button>
+    </div>
+  </dialog>
 </div>
