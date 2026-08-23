@@ -2,15 +2,17 @@
 
 <div class="city-grid-page">
   <div class="city-grid-nav city-grid-nav--top">
-    <%= link_to "↑ Up",
+    <%= link_to "↑",
           cells_path(offset_row: @offset_row - 1, offset_column: @offset_column),
-          class: "grid-arrow #{'grid-arrow--disabled' if @offset_row <= 0}" %>
+          class: "grid-arrow #{'grid-arrow--disabled' if @offset_row <= 0}",
+          "aria-label": "Move up" %>
   </div>
 
   <div class="city-grid-nav city-grid-nav--middle">
-    <%= link_to "← Left",
+    <%= link_to "←",
           cells_path(offset_row: @offset_row, offset_column: @offset_column - 1),
-          class: "grid-arrow #{'grid-arrow--disabled' if @offset_column <= 0}" %>
+          class: "grid-arrow #{'grid-arrow--disabled' if @offset_column <= 0}",
+          "aria-label": "Move left" %>
 
     <div class="city-grid"
          data-controller="sprite-walker"
@@ -54,15 +56,17 @@
       <% end %>
     </div>
 
-    <%= link_to "Right →",
+    <%= link_to "→",
           cells_path(offset_row: @offset_row, offset_column: @offset_column + 1),
-          class: "grid-arrow #{'grid-arrow--disabled' if @offset_column >= GridConfig::TOTAL_COLUMNS - GridConfig::VIEWPORT_COLUMNS}" %>
+          class: "grid-arrow #{'grid-arrow--disabled' if @offset_column >= GridConfig::TOTAL_COLUMNS - GridConfig::VIEWPORT_COLUMNS}",
+          "aria-label": "Move right" %>
   </div>
 
   <div class="city-grid-nav city-grid-nav--bottom">
-    <%= link_to "↓ Down",
+    <%= link_to "↓",
           cells_path(offset_row: @offset_row + 1, offset_column: @offset_column),
-          class: "grid-arrow #{'grid-arrow--disabled' if @offset_row >= GridConfig::TOTAL_ROWS - GridConfig::VIEWPORT_ROWS}" %>
+          class: "grid-arrow #{'grid-arrow--disabled' if @offset_row >= GridConfig::TOTAL_ROWS - GridConfig::VIEWPORT_ROWS}",
+          "aria-label": "Move down" %>
   </div>
 </div>
 
@@ -144,9 +148,32 @@
     height: 100%;
     background: repeating-linear-gradient(45deg, #f5f5f5, #f5f5f5 4px, #eee 4px, #eee 8px);
   }
+  .grid-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    box-sizing: border-box;
+    border: 1.5px solid var(--ink, #000);
+    border-radius: 4px;
+    background: var(--paper, #fff);
+    color: var(--ink, #000);
+    font-family: var(--font-display, inherit);
+    font-size: 1.1rem;
+    line-height: 1;
+    text-decoration: none;
+    transition: background 0.15s ease, color 0.15s ease;
+    user-select: none;
+  }
+  .grid-arrow:hover {
+    background: var(--ink, #000);
+    color: var(--paper, #fff);
+  }
   .grid-arrow--disabled {
     pointer-events: none;
     opacity: 0.3;
+
   }
 
   /* Walking sprites — see sprite_walker_controller.js#buildSpriteElement.
