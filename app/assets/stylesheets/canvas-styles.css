@@ -1,0 +1,111 @@
+/* ── Draw page: left-aligned, card-style canvas ─────────────── */
+
+.cell-drawer {
+  display: inline-flex;          /* shrinks to content, so it sits left, not centered */
+  flex-direction: column;
+  gap: 1rem;
+  align-items: flex-start;
+  margin: 2rem 0 2rem 1.5rem;    /* pins it to the left edge of its container */
+}
+
+/* Header: prompt (left) vs timer (right), clearly separated */
+.cell-drawer__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  width: var(--canvas-size);
+}
+
+.cell-drawer__prompt-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.cell-drawer__eyebrow {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.cell-drawer__prompt {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+
+/* Timer reads as its own object: a black chip, separate from the prompt text */
+.cell-drawer__timer {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--paper);
+  background: var(--ink);
+  padding: 0.35rem 0.65rem;
+  border-radius: 4px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+/* Canvas: gray border, sits directly below the header */
+.cell-drawer__canvas {
+  display: block;
+  width: var(--canvas-size);
+  height: var(--canvas-size);
+  background: var(--paper);
+  border: 2px solid #c9c9c9;     /* visible gray, distinct from the hairline grid lines */
+  border-radius: 2px;
+  touch-action: none;            /* keeps pointer/touch drawing from scrolling the page */
+}
+
+.cell-drawer__controls {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.btn {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0.5rem 1.1rem;
+  border-radius: 4px;
+  border: 1.5px solid var(--ink);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.btn--solid {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.btn--solid:hover {
+  background: #222;
+}
+
+.btn--outline {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.btn--outline:hover {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.btn:disabled:hover {
+  background: var(--paper);
+  color: var(--ink);
+}

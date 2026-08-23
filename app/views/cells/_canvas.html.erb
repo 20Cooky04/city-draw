@@ -6,30 +6,40 @@
      data-canvas-drawer-cell-id-value="<%= cell.id %>"
      data-canvas-drawer-update-url-value="<%= cell_path(cell) %>"
      data-canvas-drawer-duration-value="300"
-     data-canvas-drawer-line-width-value="3">
+     data-canvas-drawer-line-width-value="3"
+     data-canvas-drawer-canvas-size-value="<%= GridConfig::DRAW_CANVAS_SIZE %>"
+     style="--canvas-size: <%= GridConfig::DRAW_CANVAS_SIZE %>px;">
 
   <div class="cell-drawer__header">
-    <span class="cell-drawer__prompt"><%= cell.prompt %></span>
+    <div class="cell-drawer__prompt-block">
+      <span class="cell-drawer__eyebrow">Drawing</span>
+      <span class="cell-drawer__prompt"><%= cell.prompt %></span>
+    </div>
     <span class="cell-drawer__timer" data-canvas-drawer-target="timer">5:00</span>
   </div>
 
   <canvas class="cell-drawer__canvas"
           data-canvas-drawer-target="canvas"
-          width="600" height="600"></canvas>
+          width="<%= GridConfig::DRAW_CANVAS_SIZE %>"
+          height="<%= GridConfig::DRAW_CANVAS_SIZE %>">
+  </canvas>
 
   <div class="cell-drawer__controls">
     <button type="button"
+            class="btn btn--outline"
             data-canvas-drawer-target="undoButton"
             data-action="canvas-drawer#undo"
             disabled>
       Undo
     </button>
     <button type="button"
+            class="btn btn--solid"
             data-canvas-drawer-target="finishButton"
             data-action="canvas-drawer#finish">
       Done
     </button>
     <button type="button"
+            class="btn btn--outline"
             data-canvas-drawer-target="discardButton"
             data-action="canvas-drawer#discard">
       Discard
