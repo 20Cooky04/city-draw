@@ -11,7 +11,7 @@ module GridConfig
   # How many rows/columns are visible in the grid view at once. Must be
   # <= TOTAL_ROWS / TOTAL_COLUMNS.
   VIEWPORT_ROWS = 4
-  VIEWPORT_COLUMNS = 4
+  VIEWPORT_COLUMNS = 8
 
   # On-screen pixel size of each tile in the grid view (thumbnail size).
   CELL_SIZE = 150

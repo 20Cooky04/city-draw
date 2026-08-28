@@ -34,7 +34,7 @@ export default class extends Controller {
     gridResolution: { type: Number, default: 24 },
     // Padding (in local 0..drawCanvasSize units) around each stroke
     // segment that counts as blocked, so sprites don't graze the ink.
-    strokePadding: { type: Number, default: 1 },
+    strokePadding: { type: Number, default: 0 },
     // Moving speed in on-screen pixels per second.
     speed: { type: Number, default: 40 },
     // Asset URLs for the two sprite images, passed in from the view via
